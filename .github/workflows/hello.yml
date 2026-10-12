@@ -1,0 +1,16 @@
+name: hello
+on:
+  workflow_call:
+    inputs:
+      name:
+        type: string
+        default: world
+permissions:
+  contents: read
+jobs:
+  hello:
+    runs-on: ubuntu-latest
+    env:
+      NAME: ${{ inputs.name }}
+    steps:
+      - run: echo "Hello $NAME from secureflow"
