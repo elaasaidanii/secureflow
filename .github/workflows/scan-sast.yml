@@ -1,0 +1,30 @@
+name: scan-sast
+on:
+  workflow_call:
+    inputs:
+      semgrep-version:
+        type: string
+        default: "1.168.0"
+      config:
+        type: string
+        default: "p/default"
+permissions:
+  contents: read
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Install Semgrep
+        env:
+          VERSION: ${{ inputs.semgrep-version }}
+        run: |
+          python3 -m venv "$RUNNER_TEMP/semgrep-venv"
+          "$RUNNER_TEMP/semgrep-venv/bin/pip" install --quiet "semgrep==${VERSION}"
+      - name: Scan
+        env:
+          CONFIG: ${{ inputs.config }}
+        run: |
+          "$RUNNER_TEMP/semgrep-venv/bin/semgrep" scan --config "$CONFIG" --error --metrics=off .
